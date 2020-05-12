@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  xds-server:
+    image: tak2siva/envoy-pilot:v0.2.7
+    restart: on-failure
+    networks:
+      - xds-infra
+    ports:
+      - "9090:9090"
+    expose:
+      - 7777
+    volumes:
+      - $PWD/env_values.txt:/.env
+      - $PWD/wait-for-command.sh:/scripts/wait-for-command.sh
+    depends_on:
+      - consul-server-bootstrap
+    #command: ["./scripts/wait-for-it.sh", "consul-server-bootstrap:8500/v1/status/leader", "--", "echo", "'its up'"]
+    command: "sh -c 'apk add --no-cache curl; chmod +x /scripts/wait-for-command.sh; sh /scripts/wait-for-command.sh -t 30 -c \"curl -f http://consul-server-bootstrap:8500/v1/status/leader\" && ./Envoy-Pilot'"
+
+  consul-server-1: &consul-server
+    image: consul:latest
+    networks:
+      - xds-infra
+    command: "agent -server -retry-join consul-server-bootstrap -client 0.0.0.0"
+    logging:
+      driver: none
+
+  consul-server-2:
+    <<: *consul-server
+
+  consul-server-bootstrap:
+    <<: *consul-server
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600"
+      - "8600:8600/udp"
+    command: "agent -server -bootstrap-expect 2 -ui -client 0.0.0.0"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8500/v1/status/leader"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  xds-infra:

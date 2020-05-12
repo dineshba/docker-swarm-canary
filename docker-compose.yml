@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  app1:
+    image: tak2siva/tiny-mock-server
+    environment:
+      PORT: 8123
+      CONTENT: 'this is app --ONE--'
+      CODE: 200
+    expose:
+      - 8123
+    networks:
+      - xds-application
+  
+  app2:
+    image: tak2siva/tiny-mock-server
+    environment:
+      PORT: 8126
+      CONTENT: 'this is app --TWO--'
+      CODE: 200
+    expose:
+      - 8126
+    networks:
+      - xds-application
+
+  envoy:
+    image: envoyproxy/envoy:v1.7.0
+    volumes:
+      - $PWD/envoy-config.yaml:/envoy-config.yaml
+    command: ["envoy", "-c", "/envoy-config.yaml", "--v2-config-only", "-l", "info"]
+    # depends_on:
+    #   - xds-server
+    networks:
+      - canary_xds-infra
+      - xds-application
+    ports:
+      - "9901:9901"
+      - "10000:10000"
+
+  ## Import Consul KV Pairs
+  consul-import:
+    image: consul:latest
+    restart: on-failure
+    networks:
+      - canary_xds-infra
+    volumes:
+      - $PWD/config/values.json:/values.json
+      - $PWD/wait-for-command.sh:/scripts/wait-for-command.sh
+    # depends_on:
+      # - consul-server-bootstrap
+    command: "sh -c 'chmod +x /scripts/wait-for-command.sh; sh /scripts/wait-for-command.sh -t 30 -c \"curl -f http://consul-server-bootstrap:8500/v1/status/leader\" && CONSUL_HTTP_ADDR=consul-server-bootstrap:8500 consul kv import @values.json'"
+
+networks:
+  canary_xds-infra:
+    external: true
+  xds-application:
+    external: false
