@@ -1,29 +1,22 @@
 version: '3'
 
 services:
-  app1:
+  myapplication_behind_envoy:
     image: tak2siva/tiny-mock-server
     environment:
       PORT: 8123
-      CONTENT: 'this is app --ONE--'
+      CONTENT: 'this is app--ONE-- via envoy'
       CODE: 200
     expose:
       - 8123
     networks:
       - xds-application
-  
-  app2:
-    image: tak2siva/tiny-mock-server
-    environment:
-      PORT: 8126
-      CONTENT: 'this is app --TWO--'
-      CODE: 200
-    expose:
-      - 8126
-    networks:
-      - xds-application
-
-  envoy:
+    deploy:
+      replicas: 2
+      update_config:
+        delay: 60s
+        parallelism: 1
+  myapplication:
     image: envoyproxy/envoy:v1.7.0
     volumes:
       - $PWD/envoy-config.yaml:/envoy-config.yaml
@@ -34,8 +27,10 @@ services:
       - infra_xds-infra
       - xds-application
     ports:
+      - "8123:8123"
       - "9901:9901"
-      - "10000:10000"
+    deploy:
+      replicas: 1
 
   ## Import Consul KV Pairs
   consul-import:
@@ -44,7 +39,7 @@ services:
     networks:
       - infra_xds-infra
     volumes:
-      - $PWD/config/values.json:/values.json
+      - $PWD/config/values_new.json:/values.json
       - $PWD/wait-for-command.sh:/scripts/wait-for-command.sh
     # depends_on:
       # - consul-server-bootstrap

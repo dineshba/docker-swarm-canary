@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  utils:
+    image: arunvelsriram/utils
+    command: 'sleep 30000'
+    networks:
+      - myapplication_xds-application
+
+networks:
+  myapplication_xds-application:
+    external: true

@@ -1,48 +1,48 @@
 version: '3'
 
 services:
-  app1:
+  other1:
     image: tak2siva/tiny-mock-server
     environment:
       PORT: 8123
-      CONTENT: 'this is app --ONE--'
+      CONTENT: 'this is other --ONE--'
       CODE: 200
     expose:
       - 8123
     networks:
-      - xds-application
+      - xds-other-application
   
-  app2:
+  other2:
     image: tak2siva/tiny-mock-server
     environment:
       PORT: 8126
-      CONTENT: 'this is app --TWO--'
+      CONTENT: 'this is other --TWO--'
       CODE: 200
     expose:
       - 8126
     networks:
-      - xds-application
+      - xds-other-application
 
   envoy:
     image: envoyproxy/envoy:v1.7.0
     volumes:
       - $PWD/envoy-config.yaml:/envoy-config.yaml
-    command: ["envoy", "-c", "/envoy-config.yaml", "--v2-config-only", "-l", "info"]
+    command: ["envoy", "-c", "/envoy-config.yaml", "--v2-config-only", "-l", "info", "--service-node", "other-service-node", "--service-cluster", "other-service-node"]
     # depends_on:
     #   - xds-server
     networks:
-      - infra_xds-infra
-      - xds-application
+      - canary_xds-infra
+      - xds-other-application
     ports:
-      - "9901:9901"
-      - "10000:10000"
+      - "9902:9901"
+      - "10001:10000"
 
   ## Import Consul KV Pairs
   consul-import:
     image: consul:latest
     restart: on-failure
     networks:
-      - infra_xds-infra
+      - canary_xds-infra
     volumes:
       - $PWD/config/values.json:/values.json
       - $PWD/wait-for-command.sh:/scripts/wait-for-command.sh
@@ -51,7 +51,7 @@ services:
     command: "sh -c 'chmod +x /scripts/wait-for-command.sh; sh /scripts/wait-for-command.sh -t 30 -c \"curl -f http://consul-server-bootstrap:8500/v1/status/leader\" && CONSUL_HTTP_ADDR=consul-server-bootstrap:8500 consul kv import @values.json'"
 
 networks:
-  infra_xds-infra:
+  canary_xds-infra:
     external: true
-  xds-application:
+  xds-other-application:
     external: false

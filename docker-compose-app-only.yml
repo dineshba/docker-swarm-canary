@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  myapplication:
+    image: tak2siva/tiny-mock-server
+    environment:
+      PORT: 8123
+      CONTENT: 'this is app --ONE NEW--'
+      CODE: 200
+    expose:
+      - 8123
+    networks:
+      - xds-application
+    deploy:
+      replicas: 2
+      update_config:
+        delay: 60s
+        parallelism: 1
+
+networks:
+  xds-application:
+    external: false

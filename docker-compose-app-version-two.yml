@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  myapplication_behind_envoy_v2:
+    image: tak2siva/tiny-mock-server
+    environment:
+      PORT: 8123
+      CONTENT: 'this is app --TWO NEW-- via envoy'
+      CODE: 200
+    expose:
+      - 8123
+    networks:
+      - myapplication_xds-application
+    deploy:
+      replicas: 2
+      update_config:
+        delay: 60s
+        parallelism: 1
+
+  consul-import:
+    image: consul:latest
+    restart: on-failure
+    networks:
+      - infra_xds-infra
+    volumes:
+      - $PWD/config/values_two.json:/values.json
+      - $PWD/wait-for-command.sh:/scripts/wait-for-command.sh
+    # depends_on:
+      # - consul-server-bootstrap
+    command: "sh -c 'chmod +x /scripts/wait-for-command.sh; sh /scripts/wait-for-command.sh -t 30 -c \"curl -f http://consul-server-bootstrap:8500/v1/status/leader\" && CONSUL_HTTP_ADDR=consul-server-bootstrap:8500 consul kv import @values.json'"
+
+networks:
+  infra_xds-infra:
+    external: true
+  myapplication_xds-application:
+    external: true
