@@ -3,8 +3,8 @@ admin:
   address:
     socket_address: { address: 0.0.0.0, port_value: 9901 }
 node:
-  id: some-service-node
-  cluster: some-service-cluster
+  id: myapplication-node
+  cluster: myapplication-cluster
 dynamic_resources:
   cds_config: {ads: {}}
   lds_config: {ads: {}}

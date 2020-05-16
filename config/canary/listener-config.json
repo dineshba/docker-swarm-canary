@@ -34,11 +34,11 @@
                                                         "total_weight": 100,
                                                         "clusters": [
                                                             {
-                                                                "name": "some_service",
+                                                                "name": "myapplication_behind_envoy",
                                                                 "weight": 90
                                                             },
                                                             {
-                                                                "name": "some_service_v2",
+                                                                "name": "myapplication_behind_envoy_v2",
                                                                 "weight": 10
                                                             }
                                                         ]

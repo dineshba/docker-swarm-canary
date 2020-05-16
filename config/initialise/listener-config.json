@@ -29,7 +29,7 @@
                                                     "prefix": "/"
                                                 },
                                                 "route": {
-                                                    "cluster": "some_service"
+                                                    "cluster": "myapplication_behind_envoy"
                                                 }
                                             }
                                         ]

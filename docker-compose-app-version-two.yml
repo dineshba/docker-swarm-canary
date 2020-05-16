@@ -31,10 +31,10 @@ services:
     command: >
        sh -c 'chmod +x /scripts/wait-for-command.sh; sh /scripts/wait-for-command.sh -t 30 -c "curl -f http://consul-server-bootstrap:8500/v1/status/leader"
        && export CONSUL_HTTP_ADDR=consul-server-bootstrap:8500
-       && consul kv put xDS/app-cluster/some-service-cluster/CDS/config @cluster-config.json
-       && consul kv put xDS/app-cluster/some-service-cluster/CDS/version @cluster-version.json
-       && consul kv put xDS/app-cluster/some-service-cluster/LDS/config @listener-config.json
-       && consul kv put xDS/app-cluster/some-service-cluster/LDS/version @listener-version.json'
+       && consul kv put xDS/app-cluster/myapplication-cluster/CDS/config @cluster-config.json
+       && consul kv put xDS/app-cluster/myapplication-cluster/CDS/version @cluster-version.json
+       && consul kv put xDS/app-cluster/myapplication-cluster/LDS/config @listener-config.json
+       && consul kv put xDS/app-cluster/myapplication-cluster/LDS/version @listener-version.json'
 
 networks:
   infra_xds-infra:

@@ -1,6 +1,6 @@
 [
     {
-        "name": "some_service",
+        "name": "myapplication_behind_envoy",
         "connect_timeout": "0.25s",
         "type": "STRICT_DNS",
         "lb_policy": "ROUND_ROBIN",
@@ -14,7 +14,7 @@
         ]
     },
     {
-        "name": "some_service_v2",
+        "name": "myapplication_behind_envoy_v2",
         "connect_timeout": "0.25s",
         "type": "STRICT_DNS",
         "lb_policy": "ROUND_ROBIN",
