@@ -1,0 +1,63 @@
+[
+    {
+        "name": "listener_0",
+        "address": {
+            "socket_address": {
+                "address": "0.0.0.0",
+                "port_value": 8123
+            }
+        },
+        "filter_chains": [
+            {
+                "filters": [
+                    {
+                        "name": "envoy.http_connection_manager",
+                        "config": {
+                            "stat_prefix": "ingress_http",
+                            "codec_type": "AUTO",
+                            "route_config": {
+                                "name": "local_route",
+                                "virtual_hosts": [
+                                    {
+                                        "name": "local_service",
+                                        "domains": [
+                                            "*"
+                                        ],
+                                        "routes": [
+                                            {
+                                                "match": {
+                                                    "prefix": "/"
+                                                },
+                                                "route": {
+                                                    "weighted_clusters": {
+                                                        "runtime_key_prefix": "routing.traffic_split.some_service",
+                                                        "total_weight": 100,
+                                                        "clusters": [
+                                                            {
+                                                                "name": "some_service",
+                                                                "weight": 90
+                                                            },
+                                                            {
+                                                                "name": "some_service_v2",
+                                                                "weight": 10
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "http_filters": [
+                                {
+                                    "name": "envoy.router"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

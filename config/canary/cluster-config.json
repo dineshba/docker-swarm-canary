@@ -1,0 +1,30 @@
+[
+    {
+        "name": "some_service",
+        "connect_timeout": "0.25s",
+        "type": "STRICT_DNS",
+        "lb_policy": "ROUND_ROBIN",
+        "hosts": [
+            {
+                "socket_address": {
+                    "address": "myapplication_behind_envoy",
+                    "port_value": 8123
+                }
+            }
+        ]
+    },
+    {
+        "name": "some_service_v2",
+        "connect_timeout": "0.25s",
+        "type": "STRICT_DNS",
+        "lb_policy": "ROUND_ROBIN",
+        "hosts": [
+            {
+                "socket_address": {
+                    "address": "myapplication_behind_envoy_v2",
+                    "port_value": 8123
+                }
+            }
+        ]
+    }
+]
