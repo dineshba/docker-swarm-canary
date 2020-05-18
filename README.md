@@ -77,3 +77,34 @@ docker stack rm infra
 docker stack rm myapplication_v2
 docker stack rm utils
 ```
+
+#### Latency test after introducing envoy proxy:
+Command used for testing:
+```sh
+while true; do curl -w "%{time_total}\n" myapplication:8123/return/200?delay=1000 -o /dev/null -s; sleep 1; done;
+```
+
+```yaml
+without_proxy:
+  1.006084s
+  1.006302s
+  1.006514s
+  1.006616s
+  1.006759s
+  1.006860s
+  1.006884s
+
+with_proxy:
+  1.006429s
+  1.006636s
+  1.006747s
+  1.006885s
+  1.007227s
+  1.008819s
+  1.009144s
+  1.010470s
+```
+
+##### so max delay(approx): 0.004 seconds **(4ms)**
+
+Refer [here](https://www.getambassador.io/resources/envoyproxy-performance-on-k8s/) for better Benchmarking Envoy Proxy, HAProxy, and NGINX Performance results.
