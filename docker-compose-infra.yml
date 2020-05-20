@@ -8,8 +8,6 @@ services:
       - xds-infra
     ports:
       - "9090:9090"
-    expose:
-      - 7777
     volumes:
       - $PWD/env_values.txt:/.env
       - $PWD/wait-for-command.sh:/scripts/wait-for-command.sh

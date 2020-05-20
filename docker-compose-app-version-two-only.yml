@@ -7,8 +7,6 @@ services:
       PORT: 8123
       CONTENT: 'this is app --TWO NEW--'
       CODE: 200
-    expose:
-      - 8123
     networks:
       - xds-application
     deploy:
